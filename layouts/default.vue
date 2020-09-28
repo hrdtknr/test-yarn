@@ -50,7 +50,9 @@
       <v-list>
         <v-list-item @click.native="right = !right">
           <v-list-item-action>
-            <v-icon light> mdi-repeat </v-icon>
+            <v-icon light>
+              mdi-repeat
+            </v-icon>
           </v-list-item-action>
           <v-list-item-title>Switch drawer (click me)</v-list-item-title>
         </v-list-item>
@@ -64,33 +66,28 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
       items: [
         {
-          icon: "mdi-apps",
-          title: "Welcome",
-          to: "/",
+          icon: 'mdi-apps',
+          title: 'Welcome',
+          to: '/'
         },
         {
-          icon: "mdi-chart-bubble",
-          title: "Inspire",
-          to: "/inspire",
-        },
-        {
-          icon: "mdi-chart-bubble",
-          title: "Todo",
-          to: "/todo",
-        },
+          icon: 'mdi-chart-bubble',
+          title: 'Todo',
+          to: '/todo'
+        }
       ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: "Vuetify.js",
-    };
-  },
-};
+      title: 'Vuetify.js'
+    }
+  }
+}
 </script>
