@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-console */
 <template>
   <v-data-table
     :headers="headers"
@@ -63,7 +65,7 @@
       <v-icon small class="mr-2" @click="editTodo(item)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteTodo(item)">
+      <v-icon small @click="deleteTodo(item.id)">
         mdi-delete
       </v-icon>
     </template>
@@ -75,9 +77,27 @@
   </v-data-table>
 </template>
 
-<script>
+<script lang="ts">
 import axios from 'axios'
-export default {
+import Vue, { PropOptions } from 'vue'
+
+interface Todo {
+  id: Number,
+  name: String,
+  todo: String
+}
+
+export default Vue.extend({
+  props: {
+    editedTodo: {
+      type: Object,
+      required: true
+    } as PropOptions<Todo>,
+    editedIndex: {
+      type: Number,
+      required: true
+    }
+  },
   data: () => ({
     dialog: false,
     headers: [
@@ -94,23 +114,25 @@ export default {
     todoList: [],
     editedIndex: -1,
     editedTodo: {
-      name: '',
+      id: 0,
+      name: '', // OK
       todo: ''
     },
     defaultTodo: {
       name: '',
       todo: ''
-    }
+    },
+
   }),
 
   computed: {
-    formTitle () {
+    formTitle () :string { // 戻り値の書き方
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     }
   },
 
   watch: {
-    dialog (val) {
+    dialog (val: any) {
       val || this.close()
     }
   },
@@ -120,32 +142,36 @@ export default {
   },
 
   methods: {
-    initialize () {
+    initialize () :void{
       axios
         .get('http://localhost:8000/todoList')
         .then(response => (this.todoList = response.data))
+        // eslint-disable-next-line no-console
         .catch(error => console.log(error))
     },
 
-    editTodo (item) {
+    editTodo (item: any) :void{
       this.editedIndex = this.todoList.indexOf(item)
       this.editedTodo = Object.assign({}, item)
       this.dialog = true
     },
 
-    deleteTodo (item) {
-      const index = this.todoList.indexOf(item)
+    deleteTodo (id: Number) :void{
+      // eslint-disable-next-line no-console
+      console.log('id', id)
+      const index = this.todoList.indexOf(id)
       if (confirm('Are you sure you want to delete this item?')) {
         this.todoList.splice(index, 1)
-        const params = { id: item.id }
+        const params = { id }
         const qs = new URLSearchParams(params)
         axios
           .delete(`http://localhost:8000/todoList?${qs}`)
+          // eslint-disable-next-line no-console
           .catch(error => console.log(error))
       }
     },
 
-    close () {
+    close () :void{
       this.dialog = false
       this.$nextTick(() => {
         this.editedTodo = Object.assign({}, this.defaultTodo)
@@ -153,7 +179,7 @@ export default {
       })
     },
 
-    save () {
+    save () :void{
       if (this.editedIndex > -1) {
         Object.assign(this.todoList[this.editedIndex], this.editedTodo)
         axios
@@ -162,6 +188,7 @@ export default {
             name: this.editedTodo.name,
             todo: this.editedTodo.todo
           })
+          // eslint-disable-next-line no-console
           .catch(error => console.log(error))
       } else {
         axios
@@ -170,10 +197,11 @@ export default {
             todo: this.editedTodo.todo
           })
           .then(() => this.initialize())
+          // eslint-disable-next-line no-console
           .catch(error => console.log(error))
       }
       this.close()
     }
   }
-}
+})
 </script>
