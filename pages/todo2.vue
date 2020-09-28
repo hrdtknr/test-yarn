@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-console */
 <template>
   <v-data-table
     :headers="headers"
@@ -79,7 +77,7 @@
 
 <script lang="ts">
 import axios from 'axios'
-import Vue, { PropOptions } from 'vue'
+import Vue, { PropOptions, PropType } from 'vue'
 
 interface Todo {
   id: Number,
@@ -95,6 +93,10 @@ export default Vue.extend({
     } as PropOptions<Todo>,
     editedIndex: {
       type: Number,
+      required: true
+    },
+    todoList: {
+      type: Array as PropType<Todo[]>,
       required: true
     }
   },
