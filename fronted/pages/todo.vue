@@ -59,11 +59,11 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template v-slot:[`item.actions`]="{ item }">
       <v-icon small class="mr-2" @click="editTodo(item)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteTodo(item)">
+      <v-icon small @click="deleteTodo(item.id)">
         mdi-delete
       </v-icon>
     </template>
@@ -75,9 +75,12 @@
   </v-data-table>
 </template>
 
-<script>
+<script lang="ts">
+/* eslint-disable no-console */
 import axios from 'axios'
-export default {
+import Vue from 'vue'
+
+export default Vue.extend({
   data: () => ({
     dialog: false,
     headers: [
@@ -91,9 +94,21 @@ export default {
       { text: 'TODO', value: 'todo' },
       { text: 'Actions', value: 'actions', sortable: false }
     ],
-    todoList: [],
+    Todo: {
+      id: 0,
+      name: '',
+      todo: ''
+    },
+    todoList: [
+      {
+        id: 0,
+        name: '',
+        todo: ''
+      }
+    ],
     editedIndex: -1,
     editedTodo: {
+      id: 0,
       name: '',
       todo: ''
     },
@@ -104,13 +119,13 @@ export default {
   }),
 
   computed: {
-    formTitle () {
+    formTitle () :string {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     }
   },
 
   watch: {
-    dialog (val) {
+    dialog (val: any) {
       val || this.close()
     }
   },
@@ -120,48 +135,41 @@ export default {
   },
 
   methods: {
-    initialize () {
+    initialize () :void{
       axios
         .get('http://localhost:8000/todoList')
         .then(response => (this.todoList = response.data))
         .catch(error => console.log(error))
     },
 
-    editTodo (item) {
+    editTodo (item: any) :void{
       this.editedIndex = this.todoList.indexOf(item)
       this.editedTodo = Object.assign({}, item)
       this.dialog = true
     },
 
-    deleteTodo (item) {
-      const index = this.todoList.indexOf(item)
-      console.log(typeof item)
-      console.log(typeof index)
+    deleteTodo (id: number) :void{
       if (confirm('Are you sure you want to delete this item?')) {
-        this.todoList.splice(index, 1)
-        const params = { id: item.id }
+        this.todoList = this.todoList.filter(todo => todo.id !== id)
+        const idStr = String(id)
+        const params = { id: idStr }
         const qs = new URLSearchParams(params)
-        
-      console.log(typeof params)
-      console.log(typeof qs)
-      
-      console.log('param,s', params)
-      console.log('qs', qs)
         axios
           .delete(`http://localhost:8000/todoList?${qs}`)
           .catch(error => console.log(error))
       }
     },
 
-    close () {
+    close () :void{
       this.dialog = false
       this.$nextTick(() => {
-        this.editedTodo = Object.assign({}, this.defaultTodo)
+        this.editedTodo.name = this.defaultTodo.name
+        this.editedTodo.todo = this.defaultTodo.todo
         this.editedIndex = -1
       })
     },
 
-    save () {
+    save () :void{
       if (this.editedIndex > -1) {
         Object.assign(this.todoList[this.editedIndex], this.editedTodo)
         axios
@@ -183,5 +191,5 @@ export default {
       this.close()
     }
   }
-}
+})
 </script>

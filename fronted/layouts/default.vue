@@ -81,16 +81,6 @@ export default {
           icon: 'mdi-chart-bubble',
           title: 'Todo',
           to: '/todo'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Todo2',
-          to: '/todo2'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'test',
-          to: '/test'
         }
       ],
       miniVariant: false,
