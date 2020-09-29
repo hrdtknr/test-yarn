@@ -135,10 +135,18 @@ export default {
 
     deleteTodo (item) {
       const index = this.todoList.indexOf(item)
+      console.log(typeof item)
+      console.log(typeof index)
       if (confirm('Are you sure you want to delete this item?')) {
         this.todoList.splice(index, 1)
         const params = { id: item.id }
         const qs = new URLSearchParams(params)
+        
+      console.log(typeof params)
+      console.log(typeof qs)
+      
+      console.log('param,s', params)
+      console.log('qs', qs)
         axios
           .delete(`http://localhost:8000/todoList?${qs}`)
           .catch(error => console.log(error))

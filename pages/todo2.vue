@@ -77,29 +77,9 @@
 
 <script lang="ts">
 import axios from 'axios'
-import Vue, { PropOptions, PropType } from 'vue'
-
-interface Todo {
-  id: Number,
-  name: String,
-  todo: String
-}
+import Vue from 'vue'
 
 export default Vue.extend({
-  props: {
-    editedTodo: {
-      type: Object,
-      required: true
-    } as PropOptions<Todo>,
-    editedIndex: {
-      type: Number,
-      required: true
-    },
-    todoList: {
-      type: Array as PropType<Todo[]>,
-      required: true
-    }
-  },
   data: () => ({
     dialog: false,
     headers: [
@@ -113,22 +93,32 @@ export default Vue.extend({
       { text: 'TODO', value: 'todo' },
       { text: 'Actions', value: 'actions', sortable: false }
     ],
-    todoList: [],
-    editedIndex: -1,
-    editedTodo: {
+    Todo: {
       id: 0,
-      name: '', // OK
-      todo: ''
-    },
-    defaultTodo: {
       name: '',
       todo: ''
     },
-
+    todoList: [
+      {
+        id: 0,
+        name: '',
+        todo: ''
+      }
+    ],
+    editedIndex: -1,
+    editedTodo: {
+      id: Number,
+      name: String,
+      todo: String
+    },
+    defaultTodo: {
+      name: String,
+      todo: String
+    }
   }),
 
   computed: {
-    formTitle () :string { // 戻り値の書き方
+    formTitle () :string {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     }
   },
@@ -153,17 +143,15 @@ export default Vue.extend({
     },
 
     editTodo (item: any) :void{
+      // console.log('editTodo item', item)
       this.editedIndex = this.todoList.indexOf(item)
       this.editedTodo = Object.assign({}, item)
       this.dialog = true
     },
 
-    deleteTodo (id: Number) :void{
-      // eslint-disable-next-line no-console
-      console.log('id', id)
-      const index = this.todoList.indexOf(id)
+    deleteTodo (id: number) :void{
       if (confirm('Are you sure you want to delete this item?')) {
-        this.todoList.splice(index, 1)
+        this.todoList = this.todoList.filter(todo => todo.id !== id)
         const params = { id }
         const qs = new URLSearchParams(params)
         axios
@@ -176,7 +164,8 @@ export default Vue.extend({
     close () :void{
       this.dialog = false
       this.$nextTick(() => {
-        this.editedTodo = Object.assign({}, this.defaultTodo)
+        this.editedTodo.name = this.defaultTodo.name
+        this.editedTodo.todo = this.defaultTodo.todo
         this.editedIndex = -1
       })
     },
